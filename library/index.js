@@ -101,6 +101,18 @@ const typeDefs = `
   allBooks(author: String, genre: String): [Book!]!
   allAuthors: [Author!]!
  }
+
+ type Mutation {
+ addBook(
+  title: String!
+  author: String!
+  published: Int!
+  genres: [String!]!
+ ) :Book!
+ 
+ }
+
+
 `;
 
 const resolvers = {
@@ -119,6 +131,24 @@ const resolvers = {
       return result;
     },
     allAuthors: () => authors,
+  },
+
+  Mutation: {
+    addBook: (root, args) => {
+      const book = {
+        ...args,
+        id: crypto.randomUUID(),
+      };
+      books = books.concat(book);
+      if (!authors.find((author) => author.name === args.author)) {
+        authors = authors.concat({
+          name: args.author,
+          id: crypto.randomUUID(),
+        });
+      }
+
+      return book;
+    },
   },
 
   Author: {
