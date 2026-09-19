@@ -110,7 +110,7 @@ const typeDefs = `
       genres: [String!]!
     ): Book!
 
-    editAuthor(name: String!, bornTo: Int!): Author
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `;
 
@@ -156,7 +156,7 @@ const resolvers = {
       }
       const updatedAuthor = {
         ...author,
-        born: args.bornTo,
+        born: args.setBornTo,
       };
       authors = authors.map((a) =>
         a.id === updatedAuthor.id ? updatedAuthor : a,
