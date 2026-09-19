@@ -80,39 +80,38 @@ let books = [
 ];
 
 const typeDefs = `
- type Book {
-  title: String!
-  published: Int!
-  author: String!
-  id: ID!
-  genres: [String!]!
- }
+  type Book {
+    title: String!
+    published: Int!
+    author: String!
+    id: ID!
+    genres: [String!]!
+  }
 
- type Author {
-  name: String!
-  id: ID!
-  born: Int
-  bookCount: Int!
- }
+  type Author {
+    name: String!
+    id: ID!
+    born: Int
+    bookCount: Int!
+  }
 
- type Query {
-  bookCount: Int!
-  authorCount: Int!
-  allBooks(author: String, genre: String): [Book!]!
-  allAuthors: [Author!]!
- }
+  type Query {
+    bookCount: Int!
+    authorCount: Int!
+    allBooks(author: String, genre: String): [Book!]!
+    allAuthors: [Author!]!
+  }
 
- type Mutation {
- addBook(
-  title: String!
-  author: String!
-  published: Int!
-  genres: [String!]!
- ) :Book!
- 
- }
+  type Mutation {
+    addBook(
+      title: String!
+      author: String!
+      published: Int!
+      genres: [String!]!
+    ): Book!
 
-
+    editAuthor(name: String!, bornTo: Int!): Author
+  }
 `;
 
 const resolvers = {
@@ -148,6 +147,21 @@ const resolvers = {
       }
 
       return book;
+    },
+
+    editAuthor: (root, args) => {
+      const author = authors.find((author) => author.name === args.name);
+      if (!author) {
+        return null;
+      }
+      const updatedAuthor = {
+        ...author,
+        born: args.bornTo,
+      };
+      authors = authors.map((a) =>
+        a.id === updatedAuthor.id ? updatedAuthor : a,
+      );
+      return updatedAuthor;
     },
   },
 
