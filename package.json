@@ -1,0 +1,10 @@
+{
+  "name": "library-fullstack",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix library\" \"npm run dev --prefix library-frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
