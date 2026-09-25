@@ -5,7 +5,24 @@ const resolvers = {
   Query: {
     bookCount: async () => Book.countDocuments(),
     authorCount: async () => Author.countDocuments(),
-    allBooks: async () => Book.find({}),
+    allBooks: async (root, args) => {
+      const filter = {};
+
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author });
+        if (!author) {
+          return [];
+        }
+
+        filter.author = author._id;
+      }
+
+      if (args.genre) {
+        filter.genres = args.genre;
+      }
+
+      return Book.find(filter);
+    },
     allAuthors: async () => Author.find({}),
   },
   Mutation: {
@@ -34,6 +51,11 @@ const resolvers = {
       }
       author.born = args.setBornTo;
       return author.save();
+    },
+  },
+  Book: {
+    author: async (root) => {
+      return Author.findById(root.author);
     },
   },
 
