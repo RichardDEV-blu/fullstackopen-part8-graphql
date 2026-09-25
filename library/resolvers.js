@@ -1,5 +1,6 @@
 const Author = require("./models/author");
 const Book = require("./models/book");
+const { GraphQLError } = require("graphql");
 
 const resolvers = {
   Query: {
@@ -27,30 +28,56 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args) => {
-      let author = await Author.findOne({ name: args.author });
-      if (!author) {
-        author = new Author({
-          name: args.author,
-        });
-        await author.save();
-      }
+      try {
+        let author = await Author.findOne({ name: args.author });
 
-      const book = new Book({
-        title: args.title,
-        published: args.published,
-        author: author._id,
-        genres: args.genres,
-      });
-      return book.save();
+        if (!author) {
+          author = new Author({
+            name: args.author,
+          });
+
+          await author.save();
+        }
+
+        const book = new Book({
+          title: args.title,
+          published: args.published,
+          author: author._id,
+          genres: args.genres,
+        });
+
+        return await book.save();
+      } catch (error) {
+        throw new GraphQLError("Adding book failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args,
+            error,
+          },
+        });
+      }
     },
 
     editAuthor: async (root, args) => {
-      const author = await Author.findOne({ name: args.name });
-      if (!author) {
-        return null;
+      try {
+        const author = await Author.findOne({ name: args.name });
+
+        if (!author) {
+          return null;
+        }
+
+        author.born = args.setBornTo;
+
+        return await author.save();
+      } catch (error) {
+        throw new GraphQLError("Editing author failed", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args,
+            error,
+          },
+        });
       }
-      author.born = args.setBornTo;
-      return author.save();
     },
   },
   Book: {
