@@ -51,6 +51,8 @@ const typeDefs = `
       username: String!
       password: String!
     ): Token
+
+   _resetDatabase: Boolean
   }
 `;
 
