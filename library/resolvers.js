@@ -60,6 +60,15 @@ const resolvers = {
 
         return await book.save();
       } catch (error) {
+        if (error.name === "ValidationError") {
+          const messages = Object.values(error.errors).map((err) => err.message);
+          throw new GraphQLError(messages.join(". "), {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args,
+            },
+          });
+        }
         throw new GraphQLError("Adding book failed", {
           extensions: {
             code: "BAD_USER_INPUT",
@@ -89,6 +98,15 @@ const resolvers = {
         author.born = args.setBornTo;
         return await author.save();
       } catch (error) {
+        if (error.name === "ValidationError") {
+          const messages = Object.values(error.errors).map((err) => err.message);
+          throw new GraphQLError(messages.join(". "), {
+            extensions: {
+              code: "BAD_USER_INPUT",
+              invalidArgs: args,
+            },
+          });
+        }
         throw new GraphQLError("Editing author failed", {
           extensions: {
             code: "BAD_USER_INPUT",

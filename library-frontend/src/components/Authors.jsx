@@ -77,11 +77,19 @@ const Authors = ({ show }) => {
 
         <div>
           born
-          <input
-            type="number"
+          <select
             value={born}
-            onChange={({ target }) => setBorn(target.value)}
-          />
+            onChange={e => setBorn(e.target.value === "" ? "" : Number(e.target.value))}
+          >
+            <option value="">-- select --</option>
+            {authors
+              .filter((a) => a.born !== undefined && a.born !== null)
+              .map((a) => (
+                <option key={a.id} value={a.born}>
+                  {a.born}
+                </option>
+              ))}
+          </select>
         </div>
 
         <button type="submit" disabled={!selectedAuthor || born === ""}>
