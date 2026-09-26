@@ -147,7 +147,7 @@ const resolvers = {
       };
     },
     _resetDatabase: async () => {
-      if (process.enc.NODE_ENV !== "test") {
+      if (process.env.NODE_ENV !== "test") {
         throw new GraphQLError("_resetDatabase is only available in test mode");
       }
 
