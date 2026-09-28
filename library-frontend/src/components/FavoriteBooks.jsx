@@ -3,19 +3,24 @@ import { ALL_BOOKS, ME } from "../queries";
 
 const FavoriteBooks = ({ show, loggedIn }) => {
   const {
-    data: booksData,
-    loading: booksLoading,
-    error: booksError,
-  } = useQuery(ALL_BOOKS, {
-    skip: !show || !loggedIn,
-  });
-
-  const {
     data: meData,
     loading: meLoading,
     error: meError,
   } = useQuery(ME, {
     skip: !show || !loggedIn,
+  });
+
+  const favoriteGenre = meData?.me?.favoriteGenre;
+
+  const {
+    data: booksData,
+    loading: booksLoading,
+    error: booksError,
+  } = useQuery(ALL_BOOKS, {
+    variables: {
+      genre: favoriteGenre,
+    },
+    skip: !show || !loggedIn || !favoriteGenre,
   });
 
   if (!show) {
@@ -34,13 +39,6 @@ const FavoriteBooks = ({ show, loggedIn }) => {
     return <div>You need to be logged in</div>;
   }
 
-  const books = booksData.allBooks;
-  const favoriteGenre = meData.me?.favoriteGenre;
-
-  const favoriteBooks = books.filter((book) =>
-    book.genres.includes(favoriteGenre),
-  );
-
   return (
     <div>
       <h2>books in your favorite genre: {favoriteGenre}</h2>
@@ -53,7 +51,7 @@ const FavoriteBooks = ({ show, loggedIn }) => {
             <th>published</th>
           </tr>
 
-          {favoriteBooks.map((book) => (
+          {booksData.allBooks.map((book) => (
             <tr key={book.id}>
               <td>{book.title}</td>
               <td>{book.author.name}</td>
