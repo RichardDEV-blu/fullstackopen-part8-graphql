@@ -33,7 +33,7 @@ const App = () => {
         {!loggedIn && <button onClick={() => setPage("login")}>login</button>}
 
         {loggedIn && (
-          <button onClick={() => setPage("recommended")}>favorite books</button>
+          <button onClick={() => setPage("recommended")}>recommend</button>
         )}
 
         {loggedIn && <button onClick={logout}>logout</button>}

@@ -41,8 +41,9 @@ const FavoriteBooks = ({ show, loggedIn }) => {
 
   return (
     <div>
-      <h2>books in your favorite genre: {favoriteGenre}</h2>
-
+      <h2>recommendations</h2>
+      <h2>books in your favorite genre</h2>
+      <h2>{favoriteGenre}</h2>
       <table>
         <tbody>
           <tr>
