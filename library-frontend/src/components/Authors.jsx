@@ -1,11 +1,7 @@
 import { useQuery, useMutation } from "@apollo/client/react";
 import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries";
-import { useState } from "react";
-import Select from "react-select";
-const Authors = ({ show }) => {
-  const [selectedAuthor, setSelectedAuthor] = useState(null);
-  const [born, setBorn] = useState("");
-
+import BirthYearForm from "./BirthYearForm";
+const Authors = ({ show, loggedIn }) => {
   const { data, loading, error } = useQuery(ALL_AUTHORS);
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
@@ -26,24 +22,6 @@ const Authors = ({ show }) => {
 
   const authors = data.allAuthors;
 
-  const options = authors.map((author) => ({
-    value: author.name,
-    label: author.name,
-  }));
-
-  const submit = async (event) => {
-    event.preventDefault();
-    await editAuthor({
-      variables: {
-        name: selectedAuthor.value,
-        setBornTo: Number(born),
-      },
-    });
-
-    setSelectedAuthor(null);
-    setBorn("");
-  };
-
   return (
     <div>
       <h2>authors</h2>
@@ -63,39 +41,13 @@ const Authors = ({ show }) => {
           ))}
         </tbody>
       </table>
-      <h3>Set birth year</h3>
 
-      <form onSubmit={submit}>
-        <div>
-          <Select
-            options={options}
-            value={selectedAuthor}
-            onChange={setSelectedAuthor}
-            placeholder="Select author..."
-          />
-        </div>
-
-        <div>
-          born
-          <select
-            value={born}
-            onChange={e => setBorn(e.target.value === "" ? "" : Number(e.target.value))}
-          >
-            <option value="">-- select --</option>
-            {authors
-              .filter((a) => a.born !== undefined && a.born !== null)
-              .map((a) => (
-                <option key={a.id} value={a.born}>
-                  {a.born}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        <button type="submit" disabled={!selectedAuthor || born === ""}>
-          update author
-        </button>
-      </form>
+      {loggedIn && (
+        <BirthYearForm
+          authors={authors}
+          editAuthor={editAuthor}
+        ></BirthYearForm>
+      )}
     </div>
   );
 };
