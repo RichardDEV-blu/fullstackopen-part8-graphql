@@ -1,11 +1,27 @@
 import { useQuery } from "@apollo/client/react";
 import { ALL_BOOKS } from "../queries";
 import { useState } from "react";
+import { useApolloClient, useSubscription } from "@apollo/client/react";
+import { BOOK_ADDED } from "../queries";
+import { addBookToCache } from "../cacheHelper";
+
 const Books = (props) => {
   const [genre, setGenre] = useState(null);
   const { data, loading, error } = useQuery(ALL_BOOKS, {
     variables: {
       genre,
+    },
+  });
+  const client = useApolloClient();
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data }) => {
+      const book = data.data?.bookAdded;
+
+      if (book) {
+        window.alert(`New book added: ${book.title}`);
+        addBookToCache(genre, client.cache, book);
+      }
     },
   });
 
