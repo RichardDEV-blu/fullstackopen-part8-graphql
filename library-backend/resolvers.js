@@ -3,6 +3,8 @@ const { GraphQLError } = require("graphql");
 const Author = require("./models/author");
 const Book = require("./models/book");
 const User = require("./models/user");
+const { PubSub } = require("graphql-subscriptions");
+const pubsub = new PubSub();
 
 const resolvers = {
   Query: {
@@ -58,7 +60,13 @@ const resolvers = {
           genres: args.genres,
         });
 
-        return await book.save();
+        const savedBook = await book.save();
+
+        pubsub.publish("BOOK_ADDED", {
+          bookAdded: savedBook,
+        });
+
+        return savedBook;
       } catch (error) {
         if (error.name === "ValidationError") {
           const messages = Object.values(error.errors).map(
@@ -167,6 +175,12 @@ const resolvers = {
   Author: {
     bookCount: async (root) => {
       return Book.countDocuments({ author: root._id });
+    },
+  },
+
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterableIterator(["BOOK_ADDED"]),
     },
   },
 };
