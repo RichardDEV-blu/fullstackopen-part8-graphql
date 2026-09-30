@@ -28,7 +28,28 @@ const resolvers = {
 
       return Book.find(filter);
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => {
+      const authors = await Author.find({});
+
+      const counts = await Book.aggregate([
+        {
+          $group: {
+            _id: "$author",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const countMap = new Map(
+        counts.map((item) => [item._id.toString(), item.count]),
+      );
+
+      return authors.map((author) => ({
+        ...author.toObject(),
+        id: author._id,
+        bookCount: countMap.get(author._id.toString()) || 0,
+      }));
+    },
     me: async (root, args, context) => {
       return context.currentUser;
     },
@@ -169,12 +190,6 @@ const resolvers = {
   Book: {
     author: async (root) => {
       return Author.findById(root.author);
-    },
-  },
-
-  Author: {
-    bookCount: async (root) => {
-      return Book.countDocuments({ author: root._id });
     },
   },
 
