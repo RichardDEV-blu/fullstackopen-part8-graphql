@@ -127,7 +127,13 @@ const resolvers = {
         }
 
         author.born = args.setBornTo;
-        return await author.save();
+        const savedAuthor = await author.save();
+
+        return {
+          ...savedAuthor.toObject(),
+          id: savedAuthor._id,
+          bookCount: await Book.countDocuments({ author: savedAuthor._id }),
+        };
       } catch (error) {
         if (error.name === "ValidationError") {
           const messages = Object.values(error.errors).map(

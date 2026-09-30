@@ -8,7 +8,7 @@ const start = async () => {
 
   const backendDir = path.resolve(__dirname, '../../library-backend')
 
-  const serverProcess = spawn('node', ['index.js'], {
+  const serverProcess = spawn('node', ['server.js'], {
     cwd: backendDir,
     env: {
       ...process.env,

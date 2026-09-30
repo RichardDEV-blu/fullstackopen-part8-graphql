@@ -16,6 +16,12 @@ const NewBook = (props) => {
         (existingData) => {
           if (!existingData) return existingData;
 
+          const alreadyExists = existingData.allBooks.some(
+            (book) => book.id === data.addBook.id,
+          );
+
+          if (alreadyExists) return existingData;
+
           return {
             allBooks: existingData.allBooks.concat(data.addBook),
           };
